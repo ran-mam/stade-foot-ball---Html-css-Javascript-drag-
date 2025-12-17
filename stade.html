@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    .main {
+        display: flex;
+        margin-top: 10%;
+        justify-content: center;
+    }
+
+    /* stade */
+    .draggableBox {
+        width: 20px;
+        height: 20px;
+        padding: 10px;
+        font-size: 20px;
+        position: absolute;
+        text-align: center;
+        border-radius: 50%;
+        background-color: #222;
+        color: white;
+        cursor: move;
+        user-select: none;
+    }
+
+    .cont-drag {
+        position: relative;
+        background-image: url('stade.png');
+        background-repeat: no-repeat;
+        box-shadow: 2px 2px 10px #111;
+    }
+
+    /* palyer-list */
+    ul {
+        list-style: none;
+    }
+
+    li {
+        font-size: 1.5rem;
+        cursor: pointer;
+        display: flex;
+        width: 200px;
+        border-bottom: 1px solid #bababa;
+        padding: .6rem 0;
+        user-select: none;
+    }
+
+    li .name-player {
+        align-self: flex-start;
+        /* margin-left: auto; */
+    }
+
+    li .number {
+        width: 3rem;
+        font-weight: bold;
+    }
+</style>
+
+<body>
+    <div class="main">
+        <div class="cont-drag">
+            <div class="draggableBox">1</div>
+            <div class="draggableBox">2</div>
+            <div class="draggableBox">3</div>
+            <div class="draggableBox">4</div>
+            <div class="draggableBox">5</div>
+            <div class="draggableBox">6</div>
+            <div class="draggableBox">7</div>
+            <div class="draggableBox">6</div>
+            <div class="draggableBox">9</div>
+            <div class="draggableBox">10</div>
+            <div class="draggableBox">11</div>
+        </div>
+
+        <div class="list-player">
+            <ul>
+                <li><span class="number">7</span><span class="name-player">Zoro</span></li>
+
+                <li><span class="number">2</span><span class="name-player">Jean</span></li>
+
+                <li><span class="number">5</span><span class="name-player">Ronaldo</span></li>
+
+                <li><span class="number">1</span><span class="name-player">Nara</span></li>
+
+                <li><span class="number">10</span><span class="name-player">Dami</span></li>
+
+                <li><span class="number">13</span><span class="name-player">Casillas</span></li>
+
+                <li><span class="number">8</span><span class="name-player">Messi</span></li>
+
+                <li><span class="number">9</span><span class="name-player">Leonardo</span></li>
+
+                <li><span class="number">3</span><span class="name-player">Nrdo</span></li>
+            </ul>
+        </div>
+    </div>
+</body>
+<script>
+    var contDrag = document.querySelector('.cont-drag');
+
+    contDrag.style.width = '800px';
+    contDrag.style.height = '400px';
+
+    widthContDrag = contDrag.style.width.substring(0, contDrag.style.width.indexOf('px'));
+    heightContDrag = contDrag.style.height.substring(0, contDrag.style.height.indexOf('px'));
+
+
+    var storage = {}; // Contient l'objet du div en cours de déplacement           
+    function addEvent(element, event, func) { // Une fonction pour gérer les événements sous tous les navigateurs      
+        if (element.attachEvent) {
+            element.attachEvent('on' + event, func);
+        } else {
+            element.addEventListener(event, func, true);
+        }
+    }
+
+    function init() { // La fonction d'initialisation    
+
+        // in stade
+        var elements = document.querySelectorAll('.draggableBox');
+        for (var i = 0; i < elements.length; i++) {
+            addEvent(elements[i], 'mousedown', function (e) { // Initialise le drag & drop 
+                var s = storage;
+                s.target = e.target || event.srcElement;
+                s.offsetX = e.clientX - s.target.offsetLeft;
+                s.offsetY = e.clientY - s.target.offsetTop;
+            });
+            addEvent(elements[i], 'mouseup', function () { // Termine le drag & drop                  
+                storage = {};
+            });
+        }
+
+        // not in stade
+        var playersNotInStade = document.querySelectorAll('.list-player li');
+        
+        for (var i = 0; i < playersNotInStade.length; i++) {
+            addEvent(playersNotInStade[i], 'mousedown', function (e) { // Initialise le drag & drop
+                console.log(playersNotInStade[i]) 
+                var s = storage;
+                s.target = e.target || event.srcElement;
+                s.offsetX = e.clientX - s.target.offsetLeft;
+                s.offsetY = e.clientY - s.target.offsetTop;
+            });
+            addEvent(playersNotInStade[i], 'mouseup', function () { // Termine le drag & drop                  
+                storage = {};
+            });
+
+        }
+      
+    }
+
+    addEvent(document, 'mousemove', function (e) { // Permet le suivi du drag & drop        
+        var target = storage.target;
+        var top = 0;
+        var left = 0;
+        var right = 0;
+        var bottom = 0;
+
+        if (target) {
+            target.style.top = e.clientY - storage.offsetY + 'px';
+            target.style.left = e.clientX - storage.offsetX + 'px';
+
+            indexPxTop = target.style.top.indexOf('px');
+            indexPxLeft = target.style.left.indexOf('px');
+
+            top = parseInt(target.style.top.substring(0, indexPxTop));
+            left = parseInt(target.style.left.substring(0, indexPxLeft));
+            bottom = 360 - parseInt(target.style.top.substring(0, indexPxTop));
+            right = 760 - parseInt(target.style.left.substring(0, indexPxLeft));
+
+
+            if (top < 0) {
+                target.style.top = 0 + 'px';
+            }
+            if (left < 0) {
+                target.style.left = 0 + 'px';
+            }
+            if (bottom < 0) {
+                target.style.top = 360 + 'px';
+            }
+            if (right < 0) {
+                target.style.left = 760 + 'px';
+            }
+        }
+    });
+
+    function addEventMosemove() {
+
+    }
+    init(); // On initialise le code avec notre fonction toute prête   
+</script>
+
+<script>
+
+
+</script>
+
+</html>
